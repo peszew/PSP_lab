@@ -1,102 +1,101 @@
-# PSP Snake
+# 🎮 PSP Lab: Homebrew Projects
 
-A classic Snake game written in C for the **Sony PSP** running **Custom Firmware (PRO/ME/LME)**.
+A collection of custom homebrew applications built for the **Sony PlayStation Portable (PSP)** running **Custom Firmware (PRO/ME/LME)**.
 
----
-
-## Controls
-
-| Button | Action |
-|--------|--------|
-| D-Pad ↑↓←→ | Steer the snake |
-| **START** | Pause / Resume |
-| **X (Cross)** | Restart after Game Over |
-| **HOME** | Exit to XMB |
-
-## Gameplay
-
-- Guide the snake to eat the **pulsing red food**
-- Each piece of food grows the snake by 1 and adds 1 point to your score
-- **Every 5 points** the snake speeds up
-- Hitting a wall or yourself ends the game
-- Your **best score** is kept for the session
+This repository is split between two main homebrew projects:
+1. **🐍 PSP Snake (Stable Release)**: An optimized, double-buffered classic Snake game utilizing the `pspgu` hardware engine.
+2. **🎵 PSPify (Spotify Clone DEMO - Active WIP)**: A retro-modern Spotify desktop player clone for local MP3 playback, featuring a Y2K vaporwave skin, hardware-accelerated Media Engine decoding, and folder-based album art parsing.
 
 ---
 
-## Build Requirements
+## 🛠️ Build & SDK Environment
+
+All compilation is handled via **Docker** running the official PSPSDK toolchain. No local SDK configuration is required on the host system.
 
 | Tool | Purpose |
 |------|---------|
-| [Docker Desktop](https://www.docker.com/products/docker-desktop) | Provides the PSPSDK build environment |
-| Windows 10/11 | Host OS |
-
-The `pspdev/pspdev` Docker image contains the full PSP cross-compiler toolchain.
-No native installation of PSPSDK required.
+| [Docker Desktop](https://www.docker.com/products/docker-desktop) | Runs the compiler container |
+| Windows PowerShell | Execution shell |
 
 ---
 
-## Building
+## 🐍 1. PSP Snake (Stable)
 
-Open **PowerShell** in the `PSP_lab` folder and run:
+An optimized clone of the classic Snake game running at a smooth 60 FPS. It utilizes double-buffered VRAM switching and hardware sprites to eliminate CPU screen tearing.
 
-```powershell
-.\build.ps1
-```
+### 🎮 Controls
+* **D-Pad**: Steer the snake
+* **START**: Pause / Resume game
+* **Cross (X)**: Restart game (after Game Over)
+* **HOME**: Exit to the PSP Dashboard (XMB)
 
-The script will:
-1. Start Docker Desktop if it is not running
-2. Pull the `pspdev/pspdev` image (first run only, ~1–2 GB)
-3. Compile the game inside the container
-4. Output `snake\EBOOT.PBP`
-5. Copy `EBOOT.PBP` to `PSP\GAME\Snake\` (mirrors your memory stick layout)
-
----
-
-## Deploying to PSP
-
-1. Connect your PSP via USB **or** remove the memory stick and use a card reader
-2. On the memory stick, create the folder:
+### 🚀 Build & Run
+1. Run the Snake build script:
+   ```powershell
+   .\build.ps1
    ```
-   ms0:\PSP\GAME\Snake\
-   ```
-3. Copy `snake\EBOOT.PBP` into that folder
-4. Eject / disconnect
-5. On the PSP: **Game → Memory Stick → Snake**
-
-> **Requires Custom Firmware**: PRO-C, ME, or LME.  
-> Does NOT work on official Sony firmware.
+2. Copy `snake/EBOOT.PBP` to `ms0:\PSP\GAME\Snake\EBOOT.PBP`.
 
 ---
 
-## Project Structure
+## 🎵 2. PSPify (Spotify Clone DEMO)
 
-```
+> [!IMPORTANT]
+> **⚠️ ACTIVE DEMO & WORK IN PROGRESS**
+> This application is currently in active development. Features are subject to expand as the hardware decoder integration, user interface, and folder parsing are optimized.
+
+Recreates the late 2000s / early 2010s Spotify desktop app aesthetic on the PSP screen (480x272), styled with a retro Y2K vaporwave color palette (neon pink, cyan, and deep indigo grid lines).
+
+### 🌟 Features
+* **ME Hardware Decoder**: Decodes MP3s natively on the PSP's auxiliary **Media Engine** processor (`sceMp3` / `avcodec`), freeing the main CPU.
+* **Y2K Grid Aesthetics**: Features double-bordered frame widgets, checkered grid lines, and classic web-badges (`[WINAMP]`, `[NETSCAPE]`).
+* **Folder Cover Art**: Automatically searches the song's parent directory for files like `cover.jpg` or `cover.png` and decompresses them using `stb_image.h` to display a 64x64 album art thumbnail.
+* **Equalizer & Vol**: A 12-channel animated visualizer and dynamic progress bar / volume level controls.
+
+### 🎮 Controls
+* **D-Pad Up/Down**: Navigate the song lists
+* **Cross (X)**: Play selected track (or select playlist focus)
+* **Triangle (△)**: Pause / Resume playback
+* **Square (□)**: Stop song
+* **Left / Right Trigger**: Play Previous / Next track
+* **L/R Trigger (Hold) + D-Pad Left/Right**: Adjust playback volume
+
+### 🚀 Build & Run
+1. Run the PSPify build script:
+   ```powershell
+   .\build_pspify.ps1
+   ```
+2. Copy `pspify/EBOOT.PBP` to `ms0:\PSP\GAME\PSPify\EBOOT.PBP`.
+3. Put your MP3s in `ms0:\MUSIC\`.
+4. Put the cover art image (named `cover.jpg` or `cover.png`) in the same folder as the songs.
+
+---
+
+## 📂 Project Structure
+
+```text
 PSP_lab/
-├── build.ps1           ← Run this to build
-├── snake/
-│   ├── main.c          ← Full game source
-│   ├── Makefile        ← PSP SDK Makefile
-│   └── ICON0.PNG       ← Game icon shown in XMB (144×80 px)
+├── build.ps1             ← Compile script for Snake
+├── build_pspify.ps1      ← Compile script for PSPify
+├── README.md             ← This documentation hub
+├── snake/                ← Snake App Folder
+│   ├── main.c            ← Snake game source
+│   ├── Makefile          ← PSPSDK compilation rule
+│   └── ICON0.PNG         ← Snake XMB icon
+├── pspify/               ← PSPify App Folder
+│   ├── main.c            ← Spotify player source
+│   ├── Makefile          ← PSPSDK compilation rule
+│   ├── font8x8.h         ← Basic ASCII pixel font sheet
+│   ├── stb_image.h       ← Header-only JPEG/PNG loader
+│   └── ICON0.PNG         ← Spotify XMB icon
 └── PSP/
-    └── GAME/
-        └── Snake/
-            └── EBOOT.PBP  ← Built output (deploy this)
+    └── GAME/             ← Compiled EBOOT distribution outputs
+        ├── Snake/EBOOT.PBP
+        └── PSPify/EBOOT.PBP
 ```
 
 ---
 
-## Technical Notes
+## ⚖️ License
 
-- **Language**: C (C99)
-- **SDK**: [PSPSDK / pspdev](https://github.com/pspdev/pspdev)
-- **Display**: Direct framebuffer writes to PSP VRAM (`0x44000000`, uncached)
-- **Text**: `pspDebugScreen` for score/overlays
-- **Timing**: `sceRtc` for frame-independent snake speed
-- **Resolution**: 480×272 (native PSP)
-- **Grid**: 30×16 cells (16 px each), with a 16 px header for the score bar
-
----
-
-## License
-
-MIT — free to modify and share.
+MIT - Free to modify and share.
