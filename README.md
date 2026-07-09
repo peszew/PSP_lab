@@ -1,4 +1,4 @@
-# 🐍 PSP Snake
+#PSP Snake
 
 A classic Snake game written in C for the **Sony PSP** running **Custom Firmware (PRO/ME/LME)**.
 
